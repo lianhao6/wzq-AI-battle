@@ -6,21 +6,22 @@
 
 
 class Game {
-    std::string over[4] = { "","Íæ¼ÒÊ¤Àû","aiÊ¤Àû","Æ½¾Ö" };
+    std::string over[4] = { "","ç©å®¶èƒœåˆ©","aièƒœåˆ©","å¹³å±€" };
     std::vector<std::vector<int>> board;
     int current_player;
-    int rest;//Ê£ÓàÆå×ÓÊıÄ¿
-    int is_Gameover;// ÅĞ¶ÏÓÎÏ·ÊÇ·ñ½áÊø, 1ÎªÍæ¼ÒÊ¤Àû£¬2ÎªaiÊ¤Àû£¬3ÎªÆ½¾Ö
+    int rest;//å‰©ä½™æ£‹å­æ•°ç›®
+    int is_Gameover;// åˆ¤æ–­æ¸¸æˆæ˜¯å¦ç»“æŸ, 1ä¸ºç©å®¶èƒœåˆ©ï¼Œ2ä¸ºaièƒœåˆ©ï¼Œ3ä¸ºå¹³å±€
 
-    // Ä¬ÈÏ0ÎªÎŞÆå, 1ÎªÍæ¼Ò£¬-1ÎªAI
+    // é»˜è®¤0ä¸ºæ— æ£‹, 1ä¸ºç©å®¶ï¼Œ-1ä¸ºAI
 public:
     Game() : current_player(1), is_Gameover(0), rest(15 * 15) {
         board = std::vector<std::vector<int>>(SIZE, std::vector<int>(SIZE, 0));
     }
     void switchPlayer() {
-        current_player = -current_player; //µ±Ç°Íæ¼ÒµÄ½»»»
+        current_player = -current_player; //å½“å‰ç©å®¶çš„äº¤æ¢
     }
     void makeMove(int x, int y) {
+        rest--;
         if (board[x][y] == 0) {
             board[x][y] = current_player;
             switchPlayer();
@@ -31,23 +32,24 @@ public:
 
 
     void playerMove() {
-        int x, y; x = 1, y = 1;
-        // to do ÒªÅĞ¶Ïx,y,ÊÇ·ñºÏ·¨, ÅĞ¶ÏºÏ·¨ÔÚ½øÈëÏÂÒ»²½
+        int x, y;
+        // to do è¦åˆ¤æ–­x,y,æ˜¯å¦åˆæ³•, åˆ¤æ–­åˆæ³•åœ¨è¿›å…¥ä¸‹ä¸€æ­¥
         makeMove(x, y);
         check(x, y);
         switchPlayer();
     }
     void aiMove() {
-        int x, y; x = 1, y = 1;
-        // to do ÒªÅĞ¶Ïx,y,ÊÇ·ñºÏ·¨, ÅĞ¶ÏºÏ·¨ÔÚ½øÈëÏÂÒ»²½
+        int x, y;
+        // to do è¦åˆ¤æ–­x,y,æ˜¯å¦åˆæ³•, åˆ¤æ–­åˆæ³•åœ¨è¿›å…¥ä¸‹ä¸€æ­¥
         makeMove(x, y);
         check(x, y);
         switchPlayer();
     }
     void check(int x, int y) {
-        //to do ÅĞ¶ÏÊÇ·ñÓÎÏ·½áÊø£¬µ±Ç°ÕâÒ»²½ÊÇÔÚ(x,y),¿ÉÒÔÍ¨¹ı(x,y)ÅĞ¶ÏÊÇ·ñÓĞÎå×ÓÏàÁ¬
-        // ÅĞ¶ÏÈç¹ûÓĞÎå×ÓÏàÁ¬ Ö±½Óreturn£¬±ÜÃâ×îºóÒ»¿ÅÆå¸ÕºÃÏàÁ¬
-        if (rest == 0) is_Gameover = 3;// Æ½¾ÖÁË
+        //to do åˆ¤æ–­æ˜¯å¦æ¸¸æˆç»“æŸï¼Œå½“å‰è¿™ä¸€æ­¥æ˜¯åœ¨(x,y),å¯ä»¥é€šè¿‡(x,y)åˆ¤æ–­æ˜¯å¦æœ‰äº”å­ç›¸è¿
+        // åˆ¤æ–­å¦‚æœæœ‰äº”å­ç›¸è¿ ç›´æ¥returnï¼Œé¿å…æœ€åä¸€é¢—æ£‹åˆšå¥½ç›¸è¿
+        //ä¿®æ”¹ is_Gameover çš„å€¼
+        if (rest == 0) is_Gameover = 3;// å¹³å±€äº†
     }
     void printBoard() {
         system("clear");
