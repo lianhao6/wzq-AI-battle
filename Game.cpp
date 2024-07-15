@@ -46,11 +46,44 @@ public:
         switchPlayer();
     }
     void check(int x, int y) {
-        //to do 判断是否游戏结束，当前这一步是在(x,y),可以通过(x,y)判断是否有五子相连
-        // 判断如果有五子相连 直接return，避免最后一颗棋刚好相连
-        //修改 is_Gameover 的值
-        if (rest == 0) is_Gameover = 3;// 平局了
+    int cnt = 1;
+    // 从当前位置向左遍历
+    for (int i = x - 1; i >= 0 && board[i][y] == board[x][y]; --i, ++cnt);
+    // 从当前位置向右遍历
+    for (int i = x + 1; i < SIZE && board[i][y] == board[x][y]; ++i, ++cnt);
+    if (cnt >= 5) {
+        is_Gameover = (board[x][y] == 1) ? 1 : 2;
+        return;
     }
+    cnt = 1;
+    // 从当前位置向上遍历
+    for (int i = y - 1; i >= 0 && board[x][i] == board[x][y]; --i, ++cnt);
+    // 从当前位置向下遍历
+    for (int i = y + 1; i < SIZE && board[x][i] == board[x][y]; ++i, ++cnt);
+    if (cnt >= 5) {
+        is_Gameover = (board[x][y] == 1) ? 1 : 2;
+        return;
+    }
+    cnt = 1;
+    // 从当前位置向左上遍历
+    for (int i = x - 1, j = y - 1; i >= 0 && j >= 0 && board[i][j] == board[x][y]; --i, --j, ++cnt);
+    // 从当前位置向右下遍历
+    for (int i = x + 1, j = y + 1; i < SIZE && j < SIZE && board[i][j] == board[x][y]; ++i, ++j, ++cnt);
+    if (cnt >= 5) {
+        is_Gameover = (board[x][y] == 1) ? 1 : 2;
+        return;
+    }
+    cnt = 1;
+    // 从当前位置向右上遍历
+    for (int i = x + 1, j = y - 1; i < SIZE && j >= 0 && board[i][j] == board[x][y]; ++i, --j, ++cnt);
+    // 从当前位置向左下遍历
+    for (int i = x - 1, j = y + 1; i >= 0 && j < SIZE && board[i][j] == board[x][y]; --i, ++j, ++cnt);
+    if (cnt >= 5) {
+        is_Gameover = (board[x][y] == 1) ? 1 : 2;
+        return;
+    }
+    if (rest == 0) is_Gameover = 3; // 平局
+}
     void printBoard() {
         system("clear");
         std::cout << "  ";
