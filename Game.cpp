@@ -33,10 +33,14 @@ public:
 
     void playerMove() {
         int x, y;
+        cin >> x >> y;
+        if( x<SIZE && x>=0 && y<SIZE && y>=0 && board[x][y] == 0)
         // to do 要判断x,y,是否合法, 判断合法在进入下一步
+        {
         makeMove(x, y);
         check(x, y);
         switchPlayer();
+        }
     }
     void aiMove() {
         int x, y;
