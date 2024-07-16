@@ -79,18 +79,12 @@ public:
    str<<completion["choices"][0]["message"]["content"];
    string s;
    str>>s;
-  int a[2];
-    int i=0; 
-    int j=0;
-    while(i!=2)
-    {
-       
-        if(s[j]>=48&&s[j]<=57)
-        {
-            a[i]=s[j]-1;
-            i++;
-        }
-        j++;
+    int a[2] = { 0,0 };
+    int i = 0, j = 0;
+    while (i != 2 && j < s.size()) {
+        while (isdigit(s[j])) a[i] = s[j++] - '0' + a[i] * 10;
+        if (a[i]) i++;
+        else j++;
     }
     if(a[0]<0||a[0]>=SIZE||a[1]<0||a[1]>=SIZE||board[a[0]][a[1]]==-1||board[a[0]][a[1]]==1)
     {
@@ -118,7 +112,6 @@ public:
        {
         makeMove(a[0], a[1]);
         check(a[0], a[1]);
-        switchPlayer();
        }
     }
         
