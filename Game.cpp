@@ -32,6 +32,7 @@ public:
 
 
     void playerMove() {
+        cout << "请输入落子位置，如第一排第二列表示为：1 2" << endl;
         int x, y;
         while(1) {
             cin >> x >> y;
