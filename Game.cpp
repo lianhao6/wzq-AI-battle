@@ -45,12 +45,82 @@ public:
     }
 
     void aiMove() {
-        int x, y;
-        // to do 要判断x,y,是否合法, 判断合法在进入下一步
-        makeMove(x, y);
-        check(x, y);
-        switchPlayer();
+        using namespace std;
+        openai::start("sk-on-Jo5FAGExsug1vrAvXCQ","",true,"https://agino.me/"); 
+        strstream str;
+    string inf="这是一个尺寸为SIZE的五子棋盘，以下是棋盘的一些信息",tmp;
+        for(int i=0;i<SIZE;i++)
+        for(int j=0;j<SIZE;j++)
+        {
+            str<<"第"<<i<<"行";
+            str<<"第"<<j<<"列";
+            if(board[i][j]==1)
+            str<<"有一个黑棋";
+            else if(board[i][j]==-1)
+            str<<"有一个白棋";
+            else
+            str<<"没有棋子";
+            str>>tmp;
+        inf+=tmp;
+        str.clear(),tmp.clear();
+        }
+        inf+="现在你执白棋，请问你会怎么下，请告诉你下的坐标";
+
+
+    auto completion = openai::chat().create(R"(
+    {
+        "model": "gpt-3.5-turbo",
+        "messages": [{"role": "user", "content": "inf"}],
+        "max_tokens": 4096,
+        "temperature": 0
     }
+    )"_json); // Using user-defined (raw) string literals
+   str<<completion["choices"][0]["message"]["content"];
+   string s;
+   str>>s;
+  int a[2];
+    int i=0; 
+    int j=0;
+    while(i!=2)
+    {
+       
+        if(s[j]>=48&&s[j]<=57)
+        {
+            a[i]=s[j]-1;
+            i++;
+        }
+        j++;
+    }
+    if(a[0]<0||a[0]>=SIZE||a[1]<0||a[1]>=SIZE||board[a[0]][a[1]]==-1||board[a[0]][a[1]]==1)
+    {
+        int i,j;
+   for(i=0;i<SIZE;i++)
+   {
+    for(j=0;j<SIZE;j++)
+   {
+    if(board[i][j]==0)
+    {
+        a[0]=i;
+       a[1]=j;
+       break;
+    }
+   }
+   if(board[i][j]==0)
+   break;
+   }
+   if(i==SIZE)
+   {
+    is_Gameover=3;
+   }
+    }
+       else
+       {
+        makeMove(a[0], a[1]);
+        check(a[0], a[1]);
+        switchPlayer();
+       }
+    }
+        
     void check(int x, int y) {
     int cnt = 1;
     // 从当前位置向左遍历
