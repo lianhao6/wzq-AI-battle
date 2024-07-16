@@ -2,37 +2,37 @@
 #pragma comment( lib, "MSIMG32.LIB")
 
 
-void putimagePNG(int x, int y, IMAGE* picture) //xÎªÔØÈëÍ¼Æ¬µÄX×ø±ê£¬yÎªY×ø±ê
+void putimagePNG(int x, int y, IMAGE* picture) //xä¸ºè½½å…¥å›¾ç‰‡çš„Xåæ ‡ï¼Œyä¸ºYåæ ‡
 {
-    // ±äÁ¿³õÊ¼»¯
-    DWORD* dst = GetImageBuffer();    // GetImageBuffer()º¯Êı£¬ÓÃÓÚ»ñÈ¡»æÍ¼Éè±¸µÄÏÔ´æÖ¸Õë£¬EASYX×Ô´ø
+    // å˜é‡åˆå§‹åŒ–
+    DWORD* dst = GetImageBuffer();    // GetImageBuffer()å‡½æ•°ï¼Œç”¨äºè·å–ç»˜å›¾è®¾å¤‡çš„æ˜¾å­˜æŒ‡é’ˆï¼ŒEASYXè‡ªå¸¦
     DWORD* draw = GetImageBuffer();
-    DWORD* src = GetImageBuffer(picture); //»ñÈ¡pictureµÄÏÔ´æÖ¸Õë
-    int picture_width = picture->getwidth(); //»ñÈ¡pictureµÄ¿í¶È£¬EASYX×Ô´ø
-    int picture_height = picture->getheight(); //»ñÈ¡pictureµÄ¸ß¶È£¬EASYX×Ô´ø
-    int graphWidth = getwidth();       //»ñÈ¡»æÍ¼ÇøµÄ¿í¶È£¬EASYX×Ô´ø
-    int graphHeight = getheight();     //»ñÈ¡»æÍ¼ÇøµÄ¸ß¶È£¬EASYX×Ô´ø
-    int dstX = 0;    //ÔÚÏÔ´æÀïÏñËØµÄ½Ç±ê
+    DWORD* src = GetImageBuffer(picture); //è·å–pictureçš„æ˜¾å­˜æŒ‡é’ˆ
+    int picture_width = picture->getwidth(); //è·å–pictureçš„å®½åº¦ï¼ŒEASYXè‡ªå¸¦
+    int picture_height = picture->getheight(); //è·å–pictureçš„é«˜åº¦ï¼ŒEASYXè‡ªå¸¦
+    int graphWidth = getwidth();       //è·å–ç»˜å›¾åŒºçš„å®½åº¦ï¼ŒEASYXè‡ªå¸¦
+    int graphHeight = getheight();     //è·å–ç»˜å›¾åŒºçš„é«˜åº¦ï¼ŒEASYXè‡ªå¸¦
+    int dstX = 0;    //åœ¨æ˜¾å­˜é‡Œåƒç´ çš„è§’æ ‡
 
-    // ÊµÏÖÍ¸Ã÷ÌùÍ¼ ¹«Ê½£º Cp=¦Áp*FP+(1-¦Áp)*BP £¬ ±´Ò¶Ë¹¶¨ÀíÀ´½øĞĞµãÑÕÉ«µÄ¸ÅÂÊ¼ÆËã
+    // å®ç°é€æ˜è´´å›¾ å…¬å¼ï¼š Cp=Î±p*FP+(1-Î±p)*BP ï¼Œ è´å¶æ–¯å®šç†æ¥è¿›è¡Œç‚¹é¢œè‰²çš„æ¦‚ç‡è®¡ç®—
     for (int iy = 0; iy < picture_height; iy++)
     {
         for (int ix = 0; ix < picture_width; ix++)
         {
-            int srcX = ix + iy * picture_width; //ÔÚÏÔ´æÀïÏñËØµÄ½Ç±ê
-            int sa = ((src[srcX] & 0xff000000) >> 24); //0xAArrggbb;AAÊÇÍ¸Ã÷¶È
-            int sr = ((src[srcX] & 0xff0000) >> 16); //»ñÈ¡RGBÀïµÄR
+            int srcX = ix + iy * picture_width; //åœ¨æ˜¾å­˜é‡Œåƒç´ çš„è§’æ ‡
+            int sa = ((src[srcX] & 0xff000000) >> 24); //0xAArrggbb;AAæ˜¯é€æ˜åº¦
+            int sr = ((src[srcX] & 0xff0000) >> 16); //è·å–RGBé‡Œçš„R
             int sg = ((src[srcX] & 0xff00) >> 8);   //G
             int sb = src[srcX] & 0xff;              //B
             if (ix >= 0 && ix <= graphWidth && iy >= 0 && iy <= graphHeight && dstX <= graphWidth * graphHeight)
             {
-                dstX = (ix + x) + (iy + y) * graphWidth; //ÔÚÏÔ´æÀïÏñËØµÄ½Ç±ê
+                dstX = (ix + x) + (iy + y) * graphWidth; //åœ¨æ˜¾å­˜é‡Œåƒç´ çš„è§’æ ‡
                 int dr = ((dst[dstX] & 0xff0000) >> 16);
                 int dg = ((dst[dstX] & 0xff00) >> 8);
                 int db = dst[dstX] & 0xff;
-                draw[dstX] = ((sr * sa / 255 + dr * (255 - sa) / 255) << 16)  //¹«Ê½£º Cp=¦Áp*FP+(1-¦Áp)*BP  £» ¦Áp=sa/255 , FP=sr , BP=dr
-                    | ((sg * sa / 255 + dg * (255 - sa) / 255) << 8)         //¦Áp=sa/255 , FP=sg , BP=dg
-                    | (sb * sa / 255 + db * (255 - sa) / 255);              //¦Áp=sa/255 , FP=sb , BP=db
+                draw[dstX] = ((sr * sa / 255 + dr * (255 - sa) / 255) << 16)  //å…¬å¼ï¼š Cp=Î±p*FP+(1-Î±p)*BP  ï¼› Î±p=sa/255 , FP=sr , BP=dr
+                    | ((sg * sa / 255 + dg * (255 - sa) / 255) << 8)         //Î±p=sa/255 , FP=sg , BP=dg
+                    | (sb * sa / 255 + db * (255 - sa) / 255);              //Î±p=sa/255 , FP=sb , BP=db
             }
         }
     }
@@ -54,13 +54,13 @@ void Game::play() {
 }
 
 void Game::init() {
-    srand(time(NULL)); // Îªrand()º¯ÊıÖÖÖÖ×Ó
+    srand(time(NULL)); // ä¸ºrand()å‡½æ•°ç§ç§å­
     preX = preY = -1;
-    initgraph(897, 895); // Êä³öÖ÷Òª´°¿Ú(ºáÏñËØ£¬×İÏñËØ)
-    loadimage(0, "res/ÆåÅÌ2.jpg"); // ½«¸ÃÄ¿Â¼Í¼Æ¬Ö±½ÓÊä³öÔÚ´°¿ÚÉÏ
+    initgraph(897, 895); // è¾“å‡ºä¸»è¦çª—å£(æ¨ªåƒç´ ï¼Œçºµåƒç´ )
+    loadimage(0, "res/æ£‹ç›˜2.jpg"); // å°†è¯¥ç›®å½•å›¾ç‰‡ç›´æ¥è¾“å‡ºåœ¨çª—å£ä¸Š
     for (int i = 0; i < BoardSize; i++)
         for (int j = 0; j < BoardSize; j++)
-            board[i][j] = 0; // ³õÊ¼»°ÆåÅÌ
+            board[i][j] = 0; // åˆå§‹è¯æ£‹ç›˜
 }
 
 bool Game::isInBoard(int r, int c) {
@@ -77,34 +77,34 @@ void Game::disPlayover() {
 Game::Game(int marginX, int marginY, double chessS) : current_player(1), is_Gameover(0), rest(15 * 15) {
     board = std::vector<std::vector<int>>(BoardSize, std::vector<int>(BoardSize, 0));
     scoreBoard = std::vector<std::vector<int>>(BoardSize, std::vector<int>(BoardSize, 0));
-    //³õÊ¼»¯ÆåÅÌ×ó±ßÔµÏñËØ´óĞ¡ºÍÉÏ±ßÔµÏñËØ´óĞ¡£¬ÒÔ¼°Æå×ÓÏñËØ´óĞ¡
+    //åˆå§‹åŒ–æ£‹ç›˜å·¦è¾¹ç¼˜åƒç´ å¤§å°å’Œä¸Šè¾¹ç¼˜åƒç´ å¤§å°ï¼Œä»¥åŠæ£‹å­åƒç´ å¤§å°
     leftMargin = marginX, topMargin = marginY, chessSize = chessS;
-    // ¼ÓÔØ¸÷ÖÖÍ¼Æ¬
+    // åŠ è½½å„ç§å›¾ç‰‡
     loadimage(&chess[0], "res/black.png", chessSize, chessSize, 1); 
     loadimage(&chess[1], "res/white.png", chessSize, chessSize, 1);
     loadimage(&nowChess[0], "res/black2.png", chessSize, chessSize, 1);
     loadimage(&nowChess[1], "res/white2.png", chessSize, chessSize, 1);
-    loadimage(&win, "res/Ê¤Àû.jpg");
-    loadimage(&lose, "res/Ê§°Ü.jpg");
+    loadimage(&win, "res/èƒœåˆ©.jpg");
+    loadimage(&lose, "res/å¤±è´¥.jpg");
 }
 
 void Game::switchPlayer() {
-    current_player = -current_player; //µ±Ç°Íæ¼ÒµÄ½»»»
+    current_player = -current_player; //å½“å‰ç©å®¶çš„äº¤æ¢
 }
 
 void Game::makeMove(int r, int c) {
     rest--;
-    // ¼ÆËãÌùÆå×ÓÍ¼Æ¬µÄÏñËØÎ»ÖÃ
+    // è®¡ç®—è´´æ£‹å­å›¾ç‰‡çš„åƒç´ ä½ç½®
     int posX = c * chessSize + leftMargin - 0.5 * chessSize, 
         posY = r * chessSize + topMargin - 0.5 * chessSize;
-    // Êä³öÍ¼Æ¬
+    // è¾“å‡ºå›¾ç‰‡
     int mode = (current_player == 1 ? 0 : 1);
-    // ÓÃchess[1 - mode] ¸²¸Ç preX, preY ÉÏµÄÍ¼Æ¬
+    // ç”¨chess[1 - mode] è¦†ç›– preX, preY ä¸Šçš„å›¾ç‰‡
     if (preX != -1) putimagePNG(preX, preY, &chess[1 - mode]);
     putimagePNG(posX, posY, &nowChess[mode]);
-    // ½«µ±Ç°Î»ÖÃ¸³¸øÉÏÒ»¸öÎ»ÖÃ
+    // å°†å½“å‰ä½ç½®èµ‹ç»™ä¸Šä¸€ä¸ªä½ç½®
     preX = posX, preY = posY;
-    board[r][c] = current_player; // ÄÚ²¿ÉèÖÃboard
+    board[r][c] = current_player; // å†…éƒ¨è®¾ç½®board
     switchPlayer();
 }
 
@@ -137,14 +137,14 @@ void Game::check(int x, int y) {
 }
 
 bool Game::isValid(int x, int y, int& mr, int& mc) {
-    // ÅĞ¶ÏÊó±êµã»÷µÄÎ»ÖÃÊÇ·ñºÏ·¨
+    // åˆ¤æ–­é¼ æ ‡ç‚¹å‡»çš„ä½ç½®æ˜¯å¦åˆæ³•
     int col = (x - leftMargin) / chessSize, row = (y - topMargin) / chessSize;
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++) {
             double _x = leftMargin + (col + i) * chessSize, _y = topMargin + (row + j) * chessSize;
             mr = row + j, mc = col + i;
 			if (!isInBoard(mr, mc)) continue;
-            double offset = chessSize * 0.3; // ÉèÖÃoffset£¬ÓÃÓÚ¿ØÖÆÊó±êµã»÷µÄÔÊĞíÎó²î
+            double offset = chessSize * 0.3; // è®¾ç½®offsetï¼Œç”¨äºæ§åˆ¶é¼ æ ‡ç‚¹å‡»çš„å…è®¸è¯¯å·®
             if (pow(x - _x, 2) + pow(y - _y, 2) <= pow(offset, 2) && !board[mr][mc]) return 1;
         }
     return 0;
@@ -152,10 +152,10 @@ bool Game::isValid(int x, int y, int& mr, int& mc) {
 
 void Game::playerMove()  {
     int r, c;
-    MOUSEMSG msg = GetMouseMsg(); // Êó±êÀà + »ñÈ¡µ±Ç°Êó±êĞÅÏ¢
-    while (msg.uMsg != WM_LBUTTONDOWN /*µ¥»÷×ó¼ü*/ || !isValid(msg.x, msg.y, r, c)) 
+    MOUSEMSG msg = GetMouseMsg(); // é¼ æ ‡ç±» + è·å–å½“å‰é¼ æ ‡ä¿¡æ¯
+    while (msg.uMsg != WM_LBUTTONDOWN /*å•å‡»å·¦é”®*/ || !isValid(msg.x, msg.y, r, c)) 
         msg = GetMouseMsg();
-    // Ö±µ½Êó±êµã»÷ºÏ·¨£¬Ìø³öÑ­»·
+    // ç›´åˆ°é¼ æ ‡ç‚¹å‡»åˆæ³•ï¼Œè·³å‡ºå¾ªç¯
     std::cout << r << ' ' << c << '\n';
     makeMove(r, c);
     check(r, c);
@@ -166,21 +166,21 @@ void Game::aiMove()
     //openai::start("sk-on-Jo5FAGExsug1vrAvXCQ", "", true, "https://agino.me/"); // Will use the api key provided by `OPENAI_API_KEY` environment variable
     //// openai::start("your_API_key", "optional_organization"); // Or you can handle it yourself
     //std::strstream ss;
-    //std::string inf = u8"How are you? ÕâÊÇÒ»¸ö13x13µÄÎå×ÓÆå,ÒÑ¾­ÓĞÆå×ÓµÄµØ·½Äã²»ÄÜÏÂ\
-    //    ÒÔÏÂÊÇÆåÅÌµÄÒ»Ğ©ĞÅÏ¢:", tmp;
+    //std::string inf = u8"How are you? è¿™æ˜¯ä¸€ä¸ª13x13çš„äº”å­æ£‹,å·²ç»æœ‰æ£‹å­çš„åœ°æ–¹ä½ ä¸èƒ½ä¸‹\
+    //    ä»¥ä¸‹æ˜¯æ£‹ç›˜çš„ä¸€äº›ä¿¡æ¯:", tmp;
     //for (int i = 0; i < BoardSize; i++) {
     //    for (int j = 0; j < BoardSize; j++) {
-    //        ss << u8"µÚ" << i << u8"ĞĞ";
-    //        ss << u8"µÚ" << j << u8"ÁĞ";
-    //        if (board[i][j] == -1) ss << u8"ÉÏÓĞ°×Æå,ÕâÀïÄã²»ÄÜÏÂ;";
-    //        else if (board[i][j] == 1) ss << u8"ÉÏÓĞºÚÆå,ÕâÀïÄã²»ÄÜÏÂ;";
-    //        else ss << u8"ÉÏÎŞÆå×Ó,ÕâÀïÄã¿ÉÒÔÏÂ;";
+    //        ss << u8"ç¬¬" << i << u8"è¡Œ";
+    //        ss << u8"ç¬¬" << j << u8"åˆ—";
+    //        if (board[i][j] == -1) ss << u8"ä¸Šæœ‰ç™½æ£‹,è¿™é‡Œä½ ä¸èƒ½ä¸‹;";
+    //        else if (board[i][j] == 1) ss << u8"ä¸Šæœ‰é»‘æ£‹,è¿™é‡Œä½ ä¸èƒ½ä¸‹;";
+    //        else ss << u8"ä¸Šæ— æ£‹å­,è¿™é‡Œä½ å¯ä»¥ä¸‹;";
     //        ss >> tmp; inf += tmp;
     //        ss.clear(), tmp.clear();
     //    }
     //}
-    //inf += u8"ÏÖÔÚ,ÄãÖ´°×Æå,Ê×ÏÈÈ·±£ÄãµÄ¶ÔÊÖ²»»áÓ®,Æä´ÎÈÃ×Ô¼ºÓ®,ÒÑ¾­ÓĞÆå×ÓµÄµØ·½Äã²»ÄÜÏÂ,\
-    //    Äã»áÏÂÔÚÄÄÀï?ÇëÖ±½Ó¸ø³ö×ø±ê,ÔÙÓÃÓ¢Óï¸ø³öÀíÓÉ,Èç(1,1),ÒòÎªÕâ¸öÎ»ÖÃºÃ";
+    //inf += u8"ç°åœ¨,ä½ æ‰§ç™½æ£‹,é¦–å…ˆç¡®ä¿ä½ çš„å¯¹æ‰‹ä¸ä¼šèµ¢,å…¶æ¬¡è®©è‡ªå·±èµ¢,å·²ç»æœ‰æ£‹å­çš„åœ°æ–¹ä½ ä¸èƒ½ä¸‹,\
+    //    ä½ ä¼šä¸‹åœ¨å“ªé‡Œ?è¯·ç›´æ¥ç»™å‡ºåæ ‡,å†ç”¨è‹±è¯­ç»™å‡ºç†ç”±,å¦‚(1,1),å› ä¸ºè¿™ä¸ªä½ç½®å¥½";
     //auto completion = openai::chat().create({
     //    {"model", "gpt-3.5-turbo"},
     //    {"messages", {{{"role", "user"}, {"content", inf}}}},
@@ -203,29 +203,28 @@ void Game::aiMove()
     //    a[0] = rand() % BoardSize, a[1] = rand() % BoardSize;
     //makeMove(a[0], a[1]);
     //check(a[0], a[1]);
-
-	int personNum = 0; //ÆåÊÖ·½£¨ºÚÆå£©¶àÉÙ¸öÁ¬ĞøµÄÆå×Ó
-	int aiNum = 0; //AI·½£¨°×Æå£©Á¬ĞøÓĞ¶àÉÙ¸öÁ¬ĞøµÄÆå×Ó
-	int emptyNum = 0; // ¸Ã·½ÏòÉÏ¿Õ°×Î»µÄ¸öÊı
-	// ÆÀ·ÖÏòÁ¿Êı×éÇåÁã
+	int personNum = 0; //æ£‹æ‰‹æ–¹ï¼ˆé»‘æ£‹ï¼‰å¤šå°‘ä¸ªè¿ç»­çš„æ£‹å­
+	int aiNum = 0; //AIæ–¹ï¼ˆç™½æ£‹ï¼‰è¿ç»­æœ‰å¤šå°‘ä¸ªè¿ç»­çš„æ£‹å­
+	int emptyNum = 0; // è¯¥æ–¹å‘ä¸Šç©ºç™½ä½çš„ä¸ªæ•°
+	// è¯„åˆ†å‘é‡æ•°ç»„æ¸…é›¶
 	for (int i = 0; i < scoreBoard.size(); i++)
 		std::fill(scoreBoard[i].begin(), scoreBoard[i].end(), 0);
 
 	for (int row = 0; row < BoardSize; row++) {
 		for (int col = 0; col < BoardSize; col++) {
-			//¶ÔÃ¿¸öµã½øĞĞ¼ÆËã
+			//å¯¹æ¯ä¸ªç‚¹è¿›è¡Œè®¡ç®—
 			if (board[row][col]) continue;
 
-			for (int y = -1; y <= 0; y++) {        //YµÄ·¶Î§»¹ÊÇ-1£¬ 0
-                for (int x = -1; x <= 1; x++) {    //XµÄ·¶Î§ÊÇ -1,0,1
+			for (int y = -1; y <= 0; y++) {        //Yçš„èŒƒå›´è¿˜æ˜¯-1ï¼Œ 0
+                for (int x = -1; x <= 1; x++) {    //Xçš„èŒƒå›´æ˜¯ -1,0,1
                     if (y == 0 && x == 0) continue;
-                    if (y == 0 && x != 1) continue; //µ±y=0Ê±£¬½öÔÊĞíx=1
+                    if (y == 0 && x != 1) continue; //å½“y=0æ—¶ï¼Œä»…å…è®¸x=1
 
                     personNum = 0;
                     aiNum = 0;
                     emptyNum = 0;
 
-                    // ¼ÙÉèºÚÆåÔÚ¸ÃÎ»ÖÃÂä×Ó£¬»á¹¹³ÉÊ²Ã´ÆåĞÍ
+                    // å‡è®¾é»‘æ£‹åœ¨è¯¥ä½ç½®è½å­ï¼Œä¼šæ„æˆä»€ä¹ˆæ£‹å‹
                     for (int i = 1; i <= 4; i++) {
                         if (!i) continue;
                         int curRow = row + i * y;
@@ -237,7 +236,7 @@ void Game::aiMove()
                         else break;
                     }
 
-                    // ·´Ïò¼ÌĞø¼ÆËã
+                    // åå‘ç»§ç»­è®¡ç®—
                     for (int i = 1; i <= 4; i++) {
                         int curRow = row - i * y;
                         int curCol = col - i * x;
@@ -247,7 +246,7 @@ void Game::aiMove()
                         }
                         else break;
                     }
-                    //È¨ÖµµÄÉèÖÃ¿ÉÒÔÊÔÑé³öÀ´
+                    //æƒå€¼çš„è®¾ç½®å¯ä»¥è¯•éªŒå‡ºæ¥
                     if (personNum == 1)
                         scoreBoard[row][col] += 10;
                     else if (personNum == 2) {
@@ -263,7 +262,7 @@ void Game::aiMove()
                              scoreBoard[row][col] += 5000; //200
                     }
                     else if (personNum == 4) scoreBoard[row][col] += 20000;
-                    // ¼ÙÉè°×ÆåÔÚ¸ÃÎ»ÖÃÂä×Ó£¬»á¹¹³ÉÊ²Ã´ÆåĞÍ
+                    // å‡è®¾ç™½æ£‹åœ¨è¯¥ä½ç½®è½å­ï¼Œä¼šæ„æˆä»€ä¹ˆæ£‹å‹
                     emptyNum = 0;
                     for (int i = 1; i <= 4; i++) {
                         int curRow = row + i * y;
@@ -304,7 +303,7 @@ void Game::aiMove()
 			}
 		}
 	}
-    // È¡Êı×éÖĞÈ¨Öµ×î´óµÄµã£¬Èç¹ûÓĞ¶à¸ö£¬Ö±½ÓËæ»úÑ¡Ò»¸ö
+    // å–æ•°ç»„ä¸­æƒå€¼æœ€å¤§çš„ç‚¹ï¼Œå¦‚æœæœ‰å¤šä¸ªï¼Œç›´æ¥éšæœºé€‰ä¸€ä¸ª
     std::vector<std::pair<int, int>> q; int maxn = 0;
     for (int row = 0; row < BoardSize; row++)
         for (int col = 0; col < BoardSize; col++) {
@@ -315,7 +314,7 @@ void Game::aiMove()
         }
     std::pair<int,int> a = q[rand() % q.size()];
     
-    Sleep(1000); // Ä£ÄâAIË¼¿¼
+    Sleep(1000); // æ¨¡æ‹ŸAIæ€è€ƒ
     makeMove(a.first, a.second);
     Sleep(500);
     check(a.first, a.second);
