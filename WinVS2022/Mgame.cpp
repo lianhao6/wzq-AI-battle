@@ -163,159 +163,164 @@ void Game::playerMove()  {
 
 void Game::aiMove()
 {
-    //openai::start("sk-on-Jo5FAGExsug1vrAvXCQ", "", true, "https://agino.me/"); // Will use the api key provided by `OPENAI_API_KEY` environment variable
-    //// openai::start("your_API_key", "optional_organization"); // Or you can handle it yourself
-    //std::strstream ss;
-    //std::string inf = u8"How are you? 这是一个13x13的五子棋,已经有棋子的地方你不能下\
-    //    以下是棋盘的一些信息:", tmp;
-    //for (int i = 0; i < BoardSize; i++) {
-    //    for (int j = 0; j < BoardSize; j++) {
-    //        ss << u8"第" << i << u8"行";
-    //        ss << u8"第" << j << u8"列";
-    //        if (board[i][j] == -1) ss << u8"上有白棋,这里你不能下;";
-    //        else if (board[i][j] == 1) ss << u8"上有黑棋,这里你不能下;";
-    //        else ss << u8"上无棋子,这里你可以下;";
-    //        ss >> tmp; inf += tmp;
-    //        ss.clear(), tmp.clear();
-    //    }
-    //}
-    //inf += u8"现在,你执白棋,首先确保你的对手不会赢,其次让自己赢,已经有棋子的地方你不能下,\
-    //    你会下在哪里?请直接给出坐标,再用英语给出理由,如(1,1),因为这个位置好";
-    //auto completion = openai::chat().create({
-    //    {"model", "gpt-3.5-turbo"},
-    //    {"messages", {{{"role", "user"}, {"content", inf}}}},
-    //    {"max_tokens", 4096},
-    //    {"temperature", 0}
-    //    });
-    //std::string s = completion["choices"][0]["message"]["content"];
-    //std::cout << s << '\n';
-    //int a[2] = { 0,0 };
-    //int i = 0, j = 0;
-    //while (i != 2 && j < s.size()) {
-    //    if (isdigit(s[j])) {
-    //        while (j < s.size() && isdigit(s[j])) a[i] = s[j++] - '0' + a[i] * 10; i++;
-    //    }
-    //    j++;
-    //}
-    //std::cout << a[0] << ' ' << a[1] << '\n';
-    //while (a[0] < 0 || a[0] >= BoardSize || a[1] < 0 || a[1] >= BoardSize
-    //    || board[a[0]][a[1]])
-    //    a[0] = rand() % BoardSize, a[1] = rand() % BoardSize;
-    //makeMove(a[0], a[1]);
-    //check(a[0], a[1]);
-	int personNum = 0; //棋手方（黑棋）多少个连续的棋子
-	int aiNum = 0; //AI方（白棋）连续有多少个连续的棋子
-	int emptyNum = 0; // 该方向上空白位的个数
-	// 评分向量数组清零
-	for (int i = 0; i < scoreBoard.size(); i++)
-		std::fill(scoreBoard[i].begin(), scoreBoard[i].end(), 0);
-
-	for (int row = 0; row < BoardSize; row++) {
-		for (int col = 0; col < BoardSize; col++) {
-			//对每个点进行计算
-			if (board[row][col]) continue;
-
-			for (int y = -1; y <= 0; y++) {        //Y的范围还是-1， 0
-                for (int x = -1; x <= 1; x++) {    //X的范围是 -1,0,1
-                    if (y == 0 && x == 0) continue;
-                    if (y == 0 && x != 1) continue; //当y=0时，仅允许x=1
-
-                    personNum = 0;
-                    aiNum = 0;
-                    emptyNum = 0;
-
-                    // 假设黑棋在该位置落子，会构成什么棋型
-                    for (int i = 1; i <= 4; i++) {
-                        if (!i) continue;
-                        int curRow = row + i * y;
-                        int curCol = col + i * x;
-                        if (isInBoard(curRow, curCol) && board[curRow][curCol] == 1) personNum++;
-                        else if (isInBoard(curRow, curCol) && !board[curRow][curCol]) {
-                            emptyNum++; break;
-                        }
-                        else break;
-                    }
-
-                    // 反向继续计算
-                    for (int i = 1; i <= 4; i++) {
-                        int curRow = row - i * y;
-                        int curCol = col - i * x;
-                        if (isInBoard(curRow, curCol) && board[curRow][curCol] == 1) personNum++;
-                        else if (isInBoard(curRow, curCol) && !board[curRow][curCol]) {
-                            emptyNum++; break;
-                        }
-                        else break;
-                    }
-                    //权值的设置可以试验出来
-                    if (personNum == 1)
-                        scoreBoard[row][col] += 10;
-                    else if (personNum == 2) {
-                        if (emptyNum == 1)
-                            scoreBoard[row][col] += 30;
-                        else if (emptyNum == 2)
-                            scoreBoard[row][col] += 40;
-                    }
-                    else if (personNum == 3) {
-                         if (emptyNum == 1)
-                             scoreBoard[row][col] += 60;
-                         else if (emptyNum == 2)
-                             scoreBoard[row][col] += 5000; //200
-                    }
-                    else if (personNum == 4) scoreBoard[row][col] += 20000;
-                    // 假设白棋在该位置落子，会构成什么棋型
-                    emptyNum = 0;
-                    for (int i = 1; i <= 4; i++) {
-                        int curRow = row + i * y;
-                        int curCol = col + i * x;
-                        if (isInBoard(curRow, curCol) && board[curRow][curCol] == -1) aiNum++;
-                        else if (isInBoard(curRow, curCol) && board[curRow][curCol] == 0) {
-                            emptyNum++; break;
-                        }
-                        else break;
-                    }
-
-                    for (int i = 1; i <= 4; i++) {
-                        int curRow = row - i * y;
-                        int curCol = col - i * x;
-                        if (isInBoard(curRow, curCol) && board[curRow][curCol] == -1) aiNum++;
-                        else if (isInBoard(curRow, curCol) && board[curRow][curCol] == 0) {
-                            emptyNum++; break;
-                        }
-                        else break;
-                    }
-                    
-                    if (aiNum == 0) scoreBoard[row][col] += 5;
-                    else if (aiNum == 1) scoreBoard[row][col] += 10;
-                    else if (aiNum == 2) {
-                        if (emptyNum == 1)
-                            scoreBoard[row][col] += 25;
-                        else if (emptyNum == 2)
-                            scoreBoard[row][col] += 50;
-                    }
-                    else if (aiNum == 3) {
-                        if (emptyNum == 1)
-                            scoreBoard[row][col] += 55;
-                        else if (emptyNum == 2)
-                            scoreBoard[row][col] += 10000;
-                    }
-					else if (aiNum >= 4) scoreBoard[row][col] += 30000;
-				}
-			}
-		}
-	}
-    // 取数组中权值最大的点，如果有多个，直接随机选一个
-    std::vector<std::pair<int, int>> q; int maxn = 0;
-    for (int row = 0; row < BoardSize; row++)
-        for (int col = 0; col < BoardSize; col++) {
-            if (scoreBoard[row][col] > maxn)
-                q.clear(), maxn = scoreBoard[row][col];
-            if (scoreBoard[row][col] == maxn)
-                q.push_back({ row,col });
+    openai::start("sk-0DITh75zrxk-8tM6mhckTA", "", true, "https://agino.me/");
+    std::strstream str;
+    std::string inf = u8"现在我要和你进行一个五子棋对战游戏,\
+当有5个及以上个黑棋相连则我赢,有5个及以上个白棋相连则你赢,\
+当有""左,右,上,下,左上,右下,左下，右上""方向上有3个黑棋连续出现并且两端都没有白棋时,\
+你需要在该方向两端任意一端紧跟着我落子来阻止黑棋形成4子连珠的必杀,\
+当我出现四字连珠是你要阻止我胜利,并且要一直以阻止黑棋为首要任务,\
+当然当你认定黑棋没有威胁时可以思考下哪里对自己更优，\
+已经有棋子的地方你不能落子,这是一个尺寸为13x13的五子棋盘,以下是棋盘的一些信息", tmp;
+    for (int i = 0; i < BoardSize; i++)
+        for (int j = 0; j < BoardSize; j++) {
+            str << u8"第" << i << u8"行";
+            str << u8"第" << j << u8"列";
+            if (board[i][j] == 1) str << u8"有一个黑棋";
+            else if (board[i][j] == -1) str << u8"有一个白棋";
+            else str << u8"没有棋子";
+            str >> tmp;
+            inf += tmp;
+            str.clear(), tmp.clear();
         }
-    std::pair<int,int> a = q[rand() % q.size()];
-    
-    Sleep(1000); // 模拟AI思考
-    makeMove(a.first, a.second);
+    inf += u8"并且你执白棋,你会怎么下,请直接有英语告诉我你下的坐标和理由,比如直接回答""(1,2),because """;
+    auto completion = openai::chat().create({
+        {"model", "gpt-4o"},
+        {"messages", {{{"role", "user"}, {"content", inf}}}},
+        {"max_tokens", 4096},
+        {"temperature", 0}
+        });
+    std::string s = completion["choices"][0]["message"]["content"];
+    std::cout << s << '\n';
+    int a[2] = { 0,0 };
+    int i = 0, j = 0;
+    while (i != 2 && j < s.size()) {
+        if (isdigit(s[j])) {
+            while (j < s.size() && isdigit(s[j])) a[i] = s[j++] - '0' + a[i] * 10; i++;
+        }
+        j++;
+    }
+    std::cout << a[0] << ' ' << a[1] << '\n';
+    while (a[0] < 0 || a[0] >= BoardSize || a[1] < 0 || a[1] >= BoardSize
+        || board[a[0]][a[1]])
+        a[0] = rand() % BoardSize, a[1] = rand() % BoardSize;
+    makeMove(a[0], a[1]);
     Sleep(500);
-    check(a.first, a.second);
+    check(a[0], a[1]);
+
+	//int personNum = 0; //棋手方（黑棋）多少个连续的棋子
+	//int aiNum = 0; //AI方（白棋）连续有多少个连续的棋子
+	//int emptyNum = 0; // 该方向上空白位的个数
+	//// 评分向量数组清零
+	//for (int i = 0; i < scoreBoard.size(); i++)
+	//	std::fill(scoreBoard[i].begin(), scoreBoard[i].end(), 0);
+
+	//for (int row = 0; row < BoardSize; row++) {
+	//	for (int col = 0; col < BoardSize; col++) {
+	//		//对每个点进行计算
+	//		if (board[row][col]) continue;
+
+	//		for (int y = -1; y <= 0; y++) {        //Y的范围还是-1， 0
+ //               for (int x = -1; x <= 1; x++) {    //X的范围是 -1,0,1
+ //                   if (y == 0 && x == 0) continue;
+ //                   if (y == 0 && x != 1) continue; //当y=0时，仅允许x=1
+
+ //                   personNum = 0;
+ //                   aiNum = 0;
+ //                   emptyNum = 0;
+
+ //                   // 假设黑棋在该位置落子，会构成什么棋型
+ //                   for (int i = 1; i <= 4; i++) {
+ //                       if (!i) continue;
+ //                       int curRow = row + i * y;
+ //                       int curCol = col + i * x;
+ //                       if (isInBoard(curRow, curCol) && board[curRow][curCol] == 1) personNum++;
+ //                       else if (isInBoard(curRow, curCol) && !board[curRow][curCol]) {
+ //                           emptyNum++; break;
+ //                       }
+ //                       else break;
+ //                   }
+
+ //                   // 反向继续计算
+ //                   for (int i = 1; i <= 4; i++) {
+ //                       int curRow = row - i * y;
+ //                       int curCol = col - i * x;
+ //                       if (isInBoard(curRow, curCol) && board[curRow][curCol] == 1) personNum++;
+ //                       else if (isInBoard(curRow, curCol) && !board[curRow][curCol]) {
+ //                           emptyNum++; break;
+ //                       }
+ //                       else break;
+ //                   }
+ //                   //权值的设置可以试验出来
+ //                   if (personNum == 1)
+ //                       scoreBoard[row][col] += 10;
+ //                   else if (personNum == 2) {
+ //                       if (emptyNum == 1)
+ //                           scoreBoard[row][col] += 30;
+ //                       else if (emptyNum == 2)
+ //                           scoreBoard[row][col] += 40;
+ //                   }
+ //                   else if (personNum == 3) {
+ //                        if (emptyNum == 1)
+ //                            scoreBoard[row][col] += 60;
+ //                        else if (emptyNum == 2)
+ //                            scoreBoard[row][col] += 5000; //200
+ //                   }
+ //                   else if (personNum == 4) scoreBoard[row][col] += 20000;
+ //                   // 假设白棋在该位置落子，会构成什么棋型
+ //                   emptyNum = 0;
+ //                   for (int i = 1; i <= 4; i++) {
+ //                       int curRow = row + i * y;
+ //                       int curCol = col + i * x;
+ //                       if (isInBoard(curRow, curCol) && board[curRow][curCol] == -1) aiNum++;
+ //                       else if (isInBoard(curRow, curCol) && board[curRow][curCol] == 0) {
+ //                           emptyNum++; break;
+ //                       }
+ //                       else break;
+ //                   }
+
+ //                   for (int i = 1; i <= 4; i++) {
+ //                       int curRow = row - i * y;
+ //                       int curCol = col - i * x;
+ //                       if (isInBoard(curRow, curCol) && board[curRow][curCol] == -1) aiNum++;
+ //                       else if (isInBoard(curRow, curCol) && board[curRow][curCol] == 0) {
+ //                           emptyNum++; break;
+ //                       }
+ //                       else break;
+ //                   }
+ //                   
+ //                   if (aiNum == 0) scoreBoard[row][col] += 5;
+ //                   else if (aiNum == 1) scoreBoard[row][col] += 10;
+ //                   else if (aiNum == 2) {
+ //                       if (emptyNum == 1)
+ //                           scoreBoard[row][col] += 25;
+ //                       else if (emptyNum == 2)
+ //                           scoreBoard[row][col] += 50;
+ //                   }
+ //                   else if (aiNum == 3) {
+ //                       if (emptyNum == 1)
+ //                           scoreBoard[row][col] += 55;
+ //                       else if (emptyNum == 2)
+ //                           scoreBoard[row][col] += 10000;
+ //                   }
+	//				else if (aiNum >= 4) scoreBoard[row][col] += 30000;
+	//			}
+	//		}
+	//	}
+	//}
+ //   // 取数组中权值最大的点，如果有多个，直接随机选一个
+ //   std::vector<std::pair<int, int>> q; int maxn = 0;
+ //   for (int row = 0; row < BoardSize; row++)
+ //       for (int col = 0; col < BoardSize; col++) {
+ //           if (scoreBoard[row][col] > maxn)
+ //               q.clear(), maxn = scoreBoard[row][col];
+ //           if (scoreBoard[row][col] == maxn)
+ //               q.push_back({ row,col });
+ //       }
+ //   std::pair<int,int> a = q[rand() % q.size()];
+ //   
+ //   Sleep(1000); // 模拟AI思考
+ //   makeMove(a.first, a.second);
+ //   Sleep(500);
+ //   check(a.first, a.second);
 }
